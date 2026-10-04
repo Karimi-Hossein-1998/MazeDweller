@@ -483,7 +483,7 @@ int main(int argc, char* argv[])
     g.agent = new Agent(0, 0, *g.view);
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(Frame, 0, 1);
+    emscripten_set_main_loop(Frame, 0, 0);
 #else
     while (g.app->Running())
         Frame();
