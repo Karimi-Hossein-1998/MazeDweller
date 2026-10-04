@@ -27,7 +27,7 @@ cmake --install build --prefix ~/.local   # optional: install
 ### Web (Emscripten)
 
 Install [emsdk](https://emscripten.org/docs/getting_started/downloads.html) and
-activate it, then:
+activate it OR `$>pacman -S emscripten`, then:
 
 ```bash
 emcmake cmake -S . -B build-web
@@ -50,7 +50,7 @@ Pages**. To enable it:
 1. Repo → **Settings → Pages** → Source = **GitHub Actions**.
 2. Push to `main` (or run the workflow manually from the **Actions** tab).
 
-Your live game will be at `https://<user>.github.io/MazeDweller/`.
+Your live game will be at `https://Karimi-Hossein-1998.github.io/MazeDweller/`.
 
 ## Controls
 
