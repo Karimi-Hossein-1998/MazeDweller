@@ -1,0 +1,78 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # Web (WebAssembly) build, deployed to GitHub Pages.
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+          actions-cache-folder: emsdk-cache
+
+      - name: Configure
+        run: emcmake cmake -S . -B build-web
+
+      - name: Build
+        run: emmake cmake --build build-web --parallel
+
+      - name: Prepare dist
+        run: |
+          mkdir -p dist
+          cp build-web/index.html dist/ 2>/dev/null || true
+          cp build-web/index.js   dist/ 2>/dev/null || true
+          cp build-web/index.wasm dist/ 2>/dev/null || true
+          ls -la dist
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  # Desktop Linux build (sanity check + downloadable binary).
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DMAZEDWELLER_VENDORED_SDL=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Upload Linux binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: MazeDweller-linux-x64
+          path: build/MazeDweller
+
+  deploy:
+    needs: build-web
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

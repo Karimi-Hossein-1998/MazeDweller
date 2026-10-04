@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=MazeDweller
+Comment=A maze-dwelling game
+Exec=MazeDweller
+Icon=MazeDweller
+Terminal=false
+Categories=Game;
